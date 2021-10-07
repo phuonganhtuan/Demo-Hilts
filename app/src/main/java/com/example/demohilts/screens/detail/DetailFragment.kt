@@ -267,25 +267,25 @@ class DetailFragment : FullScreenBottomSheetDialogFragment<LayoutDetailBinding>(
     private fun displaySuccessStateVideos(videos: List<Video>) {
         if (videos.isNotEmpty()) {
             viewBinding.layoutHeader.cardPlay.show()
-            val videoUrl = videos.random().key
-            val extracor = object : YouTubeExtractor(requireContext()) {
-                override fun onExtractionComplete(
-                    ytFiles: SparseArray<YtFile>?,
-                    vMeta: VideoMeta?
-                ) {
-                    if (ytFiles != null) {
-                        val itag = 22
-                        val downloadUrl: String = ytFiles[itag].url
-                        val trailer = MediaItem.fromUri(Uri.parse(downloadUrl))
-                        viewBinding.layoutHeader.videoView.show()
-                        exoPlayer.setMediaItems(mutableListOf(trailer))
-                        exoPlayer.seekTo(0, C.TIME_UNSET)
-                        exoPlayer.prepare()
-                        exoPlayer.play()
-                    }
-                }
-            }
-            extracor.extract("https://youtu.be/" + videoUrl, true, true)
+//            val videoUrl = videos.random().key
+//            val extracor = object : YouTubeExtractor(requireContext()) {
+//                override fun onExtractionComplete(
+//                    ytFiles: SparseArray<YtFile>?,
+//                    vMeta: VideoMeta?
+//                ) {
+//                    if (ytFiles != null) {
+//                        val itag = 22
+//                        val downloadUrl: String = ytFiles[itag].url
+//                        val trailer = MediaItem.fromUri(Uri.parse(downloadUrl))
+//                        viewBinding.layoutHeader.videoView.show()
+//                        exoPlayer.setMediaItems(mutableListOf(trailer))
+//                        exoPlayer.seekTo(0, C.TIME_UNSET)
+//                        exoPlayer.prepare()
+//                        exoPlayer.play()
+//                    }
+//                }
+//            }
+//            extracor.extract("https://youtu.be/" + videoUrl, true, true)
         }
     }
 

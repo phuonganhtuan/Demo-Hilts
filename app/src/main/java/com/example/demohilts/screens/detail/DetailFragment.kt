@@ -201,12 +201,12 @@ class DetailFragment : FullScreenBottomSheetDialogFragment<LayoutDetailBinding>(
         layoutHeader.textTrailer.setOnClickListener {
             val videos = viewModel.videos.value.data?.results ?: return@setOnClickListener
             if (videos.isNotEmpty()) {
-                if (videos.size == 1) {
-                    val videoKey = videos[0].key ?: return@setOnClickListener
-                    openYoutube(videoKey)
-                } else {
+//                if (videos.size == 1) {
+//                    val videoKey = videos[0].key ?: return@setOnClickListener
+//                    openYoutube(videoKey)
+//                } else {
                     openTrailerChooser(videos)
-                }
+//                }
             }
         }
     }

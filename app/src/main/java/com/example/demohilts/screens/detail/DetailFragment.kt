@@ -23,6 +23,7 @@ import com.example.demohilts.base.MovieAdapter
 import com.example.demohilts.data.entity.*
 import com.example.demohilts.data.service.CoroutineState
 import com.example.demohilts.databinding.LayoutDetailBinding
+import com.example.demohilts.screens.detail.reviews.ReviewsAdapter
 import com.example.demohilts.screens.detail.trailers.TrailersFragment
 import com.example.demohilts.screens.genre.GenreMoviesFragment
 import com.example.demohilts.utils.Constants
@@ -52,6 +53,12 @@ class DetailFragment : FullScreenBottomSheetDialogFragment<LayoutDetailBinding>(
     @Inject
     lateinit var crewAdapter: CrewAdapter
 
+    @Inject
+    lateinit var reviewsAdapter: ReviewsAdapter
+
+    @Inject
+    lateinit var imagesAdapter: ImageAdapter
+
     val exoPlayer by lazy { SimpleExoPlayer.Builder(requireContext()).build() }
 
     private var movieId: Int? = null
@@ -69,21 +76,6 @@ class DetailFragment : FullScreenBottomSheetDialogFragment<LayoutDetailBinding>(
         setupEvents()
     }
 
-    override fun onResume() {
-        super.onResume()
-        val outMetrics = DisplayMetrics()
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-            val display = activity?.display
-            display?.getRealMetrics(outMetrics)
-        } else {
-            @Suppress("DEPRECATION")
-            val display = activity?.windowManager?.defaultDisplay
-            @Suppress("DEPRECATION")
-            display?.getMetrics(outMetrics)
-        }
-        dialog?.window?.setLayout(outMetrics.widthPixels, outMetrics.heightPixels)
-    }
-
     override fun onDestroy() {
         super.onDestroy()
         exoPlayer.release()
@@ -93,6 +85,7 @@ class DetailFragment : FullScreenBottomSheetDialogFragment<LayoutDetailBinding>(
         recyclerSimilars.adapter = similarAdapter
         recyclerCasts.adapter = castAdapter
         recyclerCrews.adapter = crewAdapter
+        recyclerReviews.adapter = reviewsAdapter
         layoutHeaderTop.gone()
         layoutHeader.videoView.player = exoPlayer
         layoutHeader.videoView.hideController()
@@ -105,6 +98,8 @@ class DetailFragment : FullScreenBottomSheetDialogFragment<LayoutDetailBinding>(
             getReviews(it, reviewPage)
             getSimilarMovies(it, similarPage)
             getVideos(it)
+            getImages(it)
+            getKws(it)
         }
     }
 
@@ -167,6 +162,28 @@ class DetailFragment : FullScreenBottomSheetDialogFragment<LayoutDetailBinding>(
                 }
             }
         }
+        lifecycleScope.launchWhenCreated {
+            images.collect {
+                when (it.status) {
+                    CoroutineState.LOADING -> displayLoadingState()
+                    CoroutineState.SUCCESS -> {
+                        it.data?.let { images -> displaySuccessStateImages(images) }
+                    }
+                    CoroutineState.ERROR -> return@collect
+                }
+            }
+        }
+        lifecycleScope.launchWhenCreated {
+            kWs.collect {
+                when (it.status) {
+                    CoroutineState.LOADING -> displayLoadingState()
+                    CoroutineState.SUCCESS -> {
+                        it.data?.keywords?.let { kWs -> displaySuccessStateKws(kWs) }
+                    }
+                    CoroutineState.ERROR -> return@collect
+                }
+            }
+        }
     }
 
     private fun setupEvents() = with(viewBinding) {
@@ -213,6 +230,7 @@ class DetailFragment : FullScreenBottomSheetDialogFragment<LayoutDetailBinding>(
     private fun displaySuccessStateDetail(data: MovieDetail) = with(viewBinding) {
         textItemName.text = data.title
         textHeader.text = data.title
+        if (data.adult) layoutHeader.textAdult.show() else layoutHeader.textAdult.gone()
         (data.overview + "\n\nReleased: ${data.release_date}\n\nCompanies: ${data.getCompaniesText()}").also {
             textDesc.text = it
         }
@@ -227,7 +245,7 @@ class DetailFragment : FullScreenBottomSheetDialogFragment<LayoutDetailBinding>(
         if (!data.genres.isNullOrEmpty()) {
             data.genres.forEach {
                 val chip = layoutInflater.inflate(
-                    R.layout.chip_genre, viewBinding.genresChipGroup, false
+                    R.layout.chip_genre, genresChipGroup, false
                 ) as Chip
                 chip.apply {
                     tag = it.id.toString()
@@ -240,7 +258,7 @@ class DetailFragment : FullScreenBottomSheetDialogFragment<LayoutDetailBinding>(
                         openGenreMovies(genre)
                     }
                 }
-                viewBinding.genresChipGroup.addView(chip)
+                genresChipGroup.addView(chip)
             }
         }
     }
@@ -259,8 +277,43 @@ class DetailFragment : FullScreenBottomSheetDialogFragment<LayoutDetailBinding>(
         similarAdapter.submitList(movies)
     }
 
-    private fun displaySuccessStateReviews(reviews: List<Comment>) = with(viewBinding) {
+    private fun displaySuccessStateImages(images: Images) = with(viewBinding) {
+        var imageList = mutableListOf<String>()
+        imageList.addAll(images.posters?.map { it.file_path.toString() } ?: emptyList())
+        imageList.addAll(images.backdrops?.map { it.file_path.toString() } ?: emptyList())
+        if (imageList.isNotEmpty()) {
+            layoutHeader.pagerImages.show()
+            layoutHeader.imagePoster.gone()
+            layoutHeader.pagerImages.adapter = imagesAdapter
+            imagesAdapter.imageList = imageList
+            imagesAdapter.notifyDataSetChanged()
+        }
+    }
 
+    private fun displaySuccessStateKws(kWs: List<KeyWord>) = with(viewBinding) {
+        kWs.forEach {
+            val chip = layoutInflater.inflate(
+                R.layout.chip_genre, kWChipGroup, false
+            ) as Chip
+            chip.apply {
+                //tag = it.id.toString()
+                text = it.name
+                isClickable = true
+                isCheckable = false
+//                setOnClickListener {
+//                    val id = it.tag.toString().toIntOrNull() ?: return@setOnClickListener
+//                    val genre = data.genres.filter { it.id == id }[0]
+//                    openGenreMovies(genre)
+//                }
+            }
+            kWChipGroup.addView(chip)
+        }
+        if (kWs.isEmpty()) textKWTitle.gone()
+    }
+
+    private fun displaySuccessStateReviews(reviews: List<Comment>) = with(viewBinding) {
+        reviewsAdapter.submitList(reviews)
+        if (reviews.isEmpty()) textReviews.gone()
     }
 
     @SuppressLint("StaticFieldLeak")
@@ -277,7 +330,7 @@ class DetailFragment : FullScreenBottomSheetDialogFragment<LayoutDetailBinding>(
 //                        val itag = 22
 //                        val downloadUrl: String = ytFiles[itag].url
 //                        val trailer = MediaItem.fromUri(Uri.parse(downloadUrl))
-//                        viewBinding.layoutHeader.videoView.show()
+//                        viewBinding.layoutHeader.videoView.show()z
 //                        exoPlayer.setMediaItems(mutableListOf(trailer))
 //                        exoPlayer.seekTo(0, C.TIME_UNSET)
 //                        exoPlayer.prepare()

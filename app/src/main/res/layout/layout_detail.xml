@@ -9,8 +9,8 @@
     <androidx.core.widget.NestedScrollView
         android:id="@+id/layoutMain"
         android:layout_width="match_parent"
-        android:fillViewport="true"
         android:layout_height="match_parent"
+        android:fillViewport="true"
         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -63,17 +63,41 @@
                 tools:text="(64)" />
 
             <TextView
+                android:id="@+id/textDescTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:text="Overview"
+                android:textColor="@android:color/white"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/layoutRating" />
+
+            <TextView
                 android:id="@+id/textDesc"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-medium"
                 android:padding="16dp"
                 android:textColor="#888888"
-                android:textSize="16sp"
+                android:textSize="15sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/layoutRating"
+                app:layout_constraintTop_toBottomOf="@id/textDescTitle"
                 tools:text="kashd kashd kashd kashd kashd kashdksh akdh kshd kasdh kashd kashd kshad kshad kshad kashd kash dksh dkadh kash kas." />
+
+            <TextView
+                android:id="@+id/textGenresTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:text="Genres"
+                android:textColor="@android:color/white"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textDesc" />
 
             <com.google.android.material.chip.ChipGroup
                 android:id="@+id/genresChipGroup"
@@ -84,7 +108,30 @@
                 app:chipSpacingVertical="0dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/textDesc" />
+                app:layout_constraintTop_toBottomOf="@id/textGenresTitle" />
+
+            <TextView
+                android:id="@+id/textKWTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:text="Keywords"
+                android:textColor="@android:color/white"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/genresChipGroup" />
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/kWChipGroup"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                app:chipSpacing="0dp"
+                app:chipSpacingVertical="0dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/textKWTitle" />
 
             <TextView
                 android:id="@+id/textCasts"
@@ -97,7 +144,7 @@
                 android:textStyle="bold"
                 android:visibility="gone"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/genresChipGroup" />
+                app:layout_constraintTop_toBottomOf="@+id/kWChipGroup" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerCasts"
@@ -150,7 +197,8 @@
                 android:id="@+id/textSimilars"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:text="Similar movies"
                 android:textColor="@android:color/white"
                 android:textSize="20sp"
@@ -171,12 +219,40 @@
                 android:paddingEnd="8dp"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/textSimilars"
                 tools:itemCount="20"
                 tools:listitem="@layout/item_movie_home" />
+
+            <TextView
+                android:id="@+id/textReviews"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:text="Reviews"
+                android:textColor="@android:color/white"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/recyclerSimilars" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerReviews"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="32dp"
+                android:clipToPadding="false"
+                android:nestedScrollingEnabled="true"
+                android:orientation="vertical"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/textReviews"
+                tools:itemCount="20"
+                tools:listitem="@layout/item_review" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
 

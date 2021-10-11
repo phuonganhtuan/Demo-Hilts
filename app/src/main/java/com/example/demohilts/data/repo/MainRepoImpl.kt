@@ -34,4 +34,17 @@ class MainRepoImpl @Inject constructor(private val apiService: ApiService) : Mai
         page: Int,
         genreId: Int
     ) = apiService.getGenreMovies(key, page, genreId)
+
+    override suspend fun searchMovies(
+        key: String,
+        page: Int,
+        query: String
+    ) = apiService.searchMovies(apiKey = key, page = page, query = query)
+
+    override suspend fun searchKW(key: String, page: Int, query: String) =
+        apiService.searchKW(key, query, page)
+
+    override suspend fun getMovieImages(id: Int, key: String) = apiService.getMovieImages(id, key)
+
+    override suspend fun getMovieKeyWords(id: Int, key: String) = apiService.getMovieKWs(id, key)
 }

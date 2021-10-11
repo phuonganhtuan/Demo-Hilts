@@ -28,6 +28,12 @@ class DetailViewModel @Inject constructor(private val repo: MainRepo) : ViewMode
     val videos: MutableStateFlow<BaseResults<BaseResponse<List<Video>>>> =
         MutableStateFlow(BaseResults.loading(null))
 
+    val images: MutableStateFlow<BaseResults<Images>> =
+        MutableStateFlow(BaseResults.loading(null))
+
+    val kWs: MutableStateFlow<BaseResults<KeyWords>> =
+        MutableStateFlow(BaseResults.loading(null))
+
     fun getDetail(id: Int) = viewModelScope.launch {
         detail.value = BaseResults.loading(null)
         try {
@@ -75,6 +81,26 @@ class DetailViewModel @Inject constructor(private val repo: MainRepo) : ViewMode
             videos.value = BaseResults.success(videosRes)
         } catch (exception: Exception) {
             videos.value = BaseResults.error(null, "Cannot get this movie videos.")
+        }
+    }
+
+    fun getImages(id: Int) = viewModelScope.launch {
+        images.value = BaseResults.loading(null)
+        try {
+            val imagesRes = repo.getMovieImages(id, apiKey)
+            images.value = BaseResults.success(imagesRes)
+        } catch (exception: Exception) {
+            images.value = BaseResults.error(null, "Cannot get this movie images.")
+        }
+    }
+
+    fun getKws(id: Int) = viewModelScope.launch {
+        kWs.value = BaseResults.loading(null)
+        try {
+            val kWsRes = repo.getMovieKeyWords(id, apiKey)
+            kWs.value = BaseResults.success(kWsRes)
+        } catch (exception: Exception) {
+            kWs.value = BaseResults.error(null, "Cannot get this movie key words.")
         }
     }
 }

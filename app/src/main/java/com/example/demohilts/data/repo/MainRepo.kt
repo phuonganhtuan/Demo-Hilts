@@ -22,4 +22,12 @@ interface MainRepo {
     suspend fun getVideos(id: Int, key: String): BaseResponse<List<Video>>
 
     suspend fun getGenreMovies(key: String, page: Int, genreId: Int): BaseResponse<List<MovieSummary>>
+
+    suspend fun searchMovies(key: String, page: Int, query: String): BaseResponse<List<MovieSummary>>
+
+    suspend fun searchKW(key: String, page: Int, query: String): BaseResponse<List<KeyWord>>
+
+    suspend fun getMovieImages(id: Int, key: String): Images
+
+    suspend fun getMovieKeyWords(id: Int, key: String): KeyWords
 }

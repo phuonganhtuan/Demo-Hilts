@@ -18,6 +18,7 @@ import com.example.demohilts.screens.detail.DetailFragment
 import com.example.demohilts.screens.genre.GenreMoviesFragment
 import com.example.demohilts.screens.home.GenresAdapter
 import com.example.demohilts.screens.home.TrendingFragment
+import com.example.demohilts.screens.search.SearchFragment
 import com.example.demohilts.utils.Constants
 import com.example.demohilts.utils.SPUtils
 import com.example.demohilts.utils.gone
@@ -146,6 +147,9 @@ class MainActivity : AppCompatActivity() {
         textPopularMore.setOnClickListener {
             openPopulars()
         }
+        imageSearch.setOnClickListener {
+            openSearch()
+        }
     }
 
     private fun displayLoadingState() = with(binding) {
@@ -203,6 +207,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun openPopulars() {
         TrendingFragment().show(supportFragmentManager, TrendingFragment::class.java.simpleName)
+    }
+
+    private fun openSearch() {
+        SearchFragment().show(supportFragmentManager, SearchFragment::class.java.simpleName)
     }
 
     private fun openGenreMovies(genre: Genre) {

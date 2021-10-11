@@ -72,4 +72,32 @@ interface ApiService {
         @Query("page") page: Int,
         @Query("with_genres") genreId: Int,
     ): BaseResponse<List<MovieSummary>>
+
+    @GET("search/movie")
+    suspend fun searchMovies(
+        @Query("language") language: String = "en-US",
+        @Query("include_adult") adult: Boolean = true,
+        @Query("api_key") apiKey: String,
+        @Query("page") page: Int,
+        @Query("query") query: String,
+    ): BaseResponse<List<MovieSummary>>
+
+    @GET("search/keyword")
+    suspend fun searchKW(
+        @Query("api_key") apiKey: String,
+        @Query("query") query: String,
+        @Query("page") page: Int = 1,
+    ): BaseResponse<List<KeyWord>>
+
+    @GET("movie/{movie_id}/keywords")
+    suspend fun getMovieKWs(
+        @Path("movie_id") id: Int,
+        @Query("api_key") key: String,
+    ): KeyWords
+
+    @GET("movie/{movie_id}/images")
+    suspend fun getMovieImages(
+        @Path("movie_id") id: Int,
+        @Query("api_key") key: String,
+    ): Images
 }

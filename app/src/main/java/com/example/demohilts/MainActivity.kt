@@ -182,6 +182,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun displayCurrent(movie: MovieDetail) = with(binding) {
         layoutWatching.apply {
+            layout.show()
             cardPlay.show()
             imageWatching.show()
             textName.show()
@@ -192,6 +193,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun hideCurrent() {
+        binding.layoutWatching.layout.gone()
         binding.layoutWatching.apply {
             cardPlay.gone()
             imageWatching.gone()

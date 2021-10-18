@@ -11,15 +11,15 @@ interface MainRepo {
 
     suspend fun getGenres(key: String): Genres
 
-    suspend fun getMovieDetail(id: Int, key: String): MovieDetail
+    suspend fun getMovieDetail(id: Int, key: String, type: String): MovieDetail
 
-    suspend fun getCastsAndCrews(id: Int, key: String): CastsCrews
+    suspend fun getCastsAndCrews(id: Int, key: String, type: String): CastsCrews
 
-    suspend fun getSimilars(id: Int, key: String, page: Int): BaseResponse<List<MovieSummary>>
+    suspend fun getSimilars(id: Int, key: String, page: Int, type: String): BaseResponse<List<MovieSummary>>
 
-    suspend fun getReviews(id: Int, key: String, page: Int): BaseResponse<List<Comment>>
+    suspend fun getReviews(id: Int, key: String, page: Int, type: String): BaseResponse<List<Comment>>
 
-    suspend fun getVideos(id: Int, key: String): BaseResponse<List<Video>>
+    suspend fun getVideos(id: Int, key: String, type: String): BaseResponse<List<Video>>
 
     suspend fun getGenreMovies(key: String, page: Int, genreId: Int): BaseResponse<List<MovieSummary>>
 
@@ -27,7 +27,7 @@ interface MainRepo {
 
     suspend fun searchKW(key: String, page: Int, query: String): BaseResponse<List<KeyWord>>
 
-    suspend fun getMovieImages(id: Int, key: String): Images
+    suspend fun getMovieImages(id: Int, key: String, type: String): Images
 
-    suspend fun getMovieKeyWords(id: Int, key: String): KeyWords
+    suspend fun getMovieKeyWords(id: Int, key: String, type: String): KeyWords
 }

@@ -10,7 +10,6 @@ interface ApiService {
 
     @GET("discover/movie")
     suspend fun getDiscover(
-        @Query("language") language: String = "en-US",
         @Query("sort_by") sort: String = "popularity.desc",
         @Query("include_adult") adult: Boolean = true,
         @Query("include_video") video: Boolean = true,
@@ -27,43 +26,43 @@ interface ApiService {
     @GET("genre/movie/list")
     suspend fun getGenres(
         @Query("api_key") apiKey: String,
-        @Query("language") language: String = "en-US",
     ): Genres
 
-    @GET("movie/{movie_id}")
+    @GET("{movie}/{movie_id}")
     suspend fun getMovieDetail(
+        @Path("movie") type: String,
         @Path("movie_id") id: Int,
         @Query("api_key") key: String,
     ): MovieDetail
 
-    @GET("movie/{movie_id}/credits")
+    @GET("{movie}/{movie_id}/credits")
     suspend fun getCastsAndCrews(
+        @Path("movie") type: String,
         @Path("movie_id") id: Int,
         @Query("api_key") key: String,
-        @Query("language") language: String = "en-US",
     ): CastsCrews
 
-    @GET("movie/{movie_id}/similar")
+    @GET("{movie}/{movie_id}/similar")
     suspend fun getSimilars(
+        @Path("movie") type: String,
         @Path("movie_id") id: Int,
         @Query("api_key") key: String,
-        @Query("language") language: String = "en-US",
         @Query("page") page: Int,
     ): BaseResponse<List<MovieSummary>>
 
-    @GET("movie/{movie_id}/reviews")
+    @GET("{movie}/{movie_id}/reviews")
     suspend fun getReviews(
+        @Path("movie") type: String,
         @Path("movie_id") id: Int,
         @Query("api_key") key: String,
-        @Query("language") language: String = "en-US",
         @Query("page") page: Int,
     ): BaseResponse<List<Comment>>
 
-    @GET("movie/{movie_id}/videos")
+    @GET("{movie}/{movie_id}/videos")
     suspend fun getMovieVideos(
+        @Path("movie") type: String,
         @Path("movie_id") id: Int,
         @Query("api_key") key: String,
-        @Query("language") language: String = "en-US",
     ): BaseResponse<List<Video>>
 
     @GET("discover/movie")
@@ -75,7 +74,6 @@ interface ApiService {
 
     @GET("search/movie")
     suspend fun searchMovies(
-        @Query("language") language: String = "en-US",
         @Query("include_adult") adult: Boolean = true,
         @Query("api_key") apiKey: String,
         @Query("page") page: Int,
@@ -89,14 +87,16 @@ interface ApiService {
         @Query("page") page: Int = 1,
     ): BaseResponse<List<KeyWord>>
 
-    @GET("movie/{movie_id}/keywords")
+    @GET("{movie}/{movie_id}/keywords")
     suspend fun getMovieKWs(
+        @Path("movie") type: String,
         @Path("movie_id") id: Int,
         @Query("api_key") key: String,
     ): KeyWords
 
-    @GET("movie/{movie_id}/images")
+    @GET("{movie}/{movie_id}/images")
     suspend fun getMovieImages(
+        @Path("movie") type: String,
         @Path("movie_id") id: Int,
         @Query("api_key") key: String,
     ): Images

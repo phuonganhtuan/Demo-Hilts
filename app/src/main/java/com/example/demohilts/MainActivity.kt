@@ -1,7 +1,6 @@
 package com.example.demohilts
 
 import android.os.Bundle
-import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -16,6 +15,7 @@ import com.example.demohilts.data.service.CoroutineState
 import com.example.demohilts.databinding.ActivityMainBinding
 import com.example.demohilts.screens.detail.DetailFragment
 import com.example.demohilts.screens.genre.GenreMoviesFragment
+import com.example.demohilts.screens.kw.KWMoviesFragment
 import com.example.demohilts.screens.home.GenresAdapter
 import com.example.demohilts.screens.home.TrendingFragment
 import com.example.demohilts.screens.search.SearchFragment
@@ -63,6 +63,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun initData() = with(mainViewModel) {
         CurrentData.currentId.value = SPUtils.getCurrentId(this@MainActivity)
+        CurrentData.currentType = SPUtils.getCurrentType(this@MainActivity)
         getTrendingMovies()
         getPopularMovies(page)
         getGenres()
@@ -117,11 +118,11 @@ class MainActivity : AppCompatActivity() {
         }
         lifecycleScope.launchWhenCreated {
             CurrentData.currentId.collect {
-                if (it != -1) {
-                    getCurrentDetail(it)
-                } else {
-                    hideCurrent()
-                }
+               // if (it != -1) {
+                    getCurrentDetail(it, CurrentData.currentType)
+               // } else {
+                  //  hideCurrent()
+               // }
             }
         }
     }
@@ -132,17 +133,17 @@ class MainActivity : AppCompatActivity() {
             mainViewModel.getTrendingMovies()
             mainViewModel.getGenres()
         }
-        popularAdapter.onClickListener = {
-            openDetail(it)
+        popularAdapter.onClickListener = { id, type ->
+            openDetail(id, type)
         }
-        trendingAdapter.onClickListener = {
-            openDetail(it)
+        trendingAdapter.onClickListener = { id, type ->
+            openDetail(id, type)
         }
         genresAdapter.onClickListener = {
             openGenreMovies(it)
         }
         layoutWatching.imageDetail.setOnClickListener {
-            openDetail(CurrentData.currentId.value)
+            openDetail(CurrentData.currentId.value, CurrentData.currentType)
         }
         textPopularMore.setOnClickListener {
             openPopulars()
@@ -176,8 +177,8 @@ class MainActivity : AppCompatActivity() {
         genresAdapter.submitList(data)
     }
 
-    private fun getCurrentDetail(id: Int) {
-        mainViewModel.getDetail(id)
+    private fun getCurrentDetail(id: Int, type: String) {
+        mainViewModel.getDetail(id, type)
     }
 
     private fun displayCurrent(movie: MovieDetail) = with(binding) {
@@ -189,6 +190,10 @@ class MainActivity : AppCompatActivity() {
             Glide.with(this@MainActivity).load(Constants.baseImageUrl + movie.backdrop_path)
                 .into(imageWatching)
             textName.text = movie.title ?: "---"
+            if (!movie.name.isNullOrEmpty()) {
+                textName.text = movie.name
+            }
+            if (movie.adult) textAdult.show() else textAdult.gone()
         }
     }
 
@@ -201,10 +206,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun openDetail(id: Int) {
-        val detailFragment = DetailFragment.getInstance(id)
+    private fun openDetail(id: Int, type: String) {
+        val detailFragment = DetailFragment.getInstance(id, type)
         detailFragment.show(supportFragmentManager, detailFragment::class.java.simpleName)
-        SPUtils.saveCurrentId(this, id)
+        SPUtils.saveCurrentId(this, id, type)
     }
 
     private fun openPopulars() {

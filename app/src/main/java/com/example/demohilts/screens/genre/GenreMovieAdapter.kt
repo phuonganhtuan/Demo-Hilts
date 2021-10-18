@@ -2,22 +2,21 @@ package com.example.demohilts.screens.genre
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.demohilts.base.MovieSummaryDiffCallback
-import com.example.demohilts.base.MovieVH
 import com.example.demohilts.data.entity.MovieSummary
 import com.example.demohilts.databinding.ItemMovieBinding
-import com.example.demohilts.databinding.ItemMovieHomeBinding
 import com.example.demohilts.utils.Constants.baseImageUrl
+import com.example.demohilts.utils.gone
+import com.example.demohilts.utils.show
 import javax.inject.Inject
 
 class GenreMovieAdapter @Inject constructor() :
     ListAdapter<MovieSummary, GenreMovieVH>(MovieSummaryDiffCallback()) {
 
-    var onClickListener: ((Int) -> Any)? = null
+    var onClickListener: ((Int, String) -> Any)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GenreMovieVH {
         val itemVB =
@@ -32,7 +31,7 @@ class GenreMovieAdapter @Inject constructor() :
 
 class GenreMovieVH(
     private val itemVB: ItemMovieBinding,
-    private val onClickListener: ((Int) -> Any)?
+    private val onClickListener: ((Int, String) -> Any)?
 ) : RecyclerView.ViewHolder(itemVB.root) {
 
     private var movie: MovieSummary? = null
@@ -40,7 +39,9 @@ class GenreMovieVH(
     init {
         itemVB.imagePoster.setOnClickListener {
             movie?.id?.let {
-                onClickListener?.let { clickListener -> clickListener(it) }
+                var type = movie?.media_type.toString()
+                if (type == "null") type = "movie"
+                onClickListener?.let { clickListener -> clickListener(it, type) }
             }
         }
     }
@@ -49,5 +50,6 @@ class GenreMovieVH(
         Glide.with(itemView.context).load(baseImageUrl + data.backdrop_path).into(imagePoster)
         textName.text = data.title ?: "---"
         movie = data
+        if (data.adult == true) textAdult.show() else textAdult.gone()
     }
 }

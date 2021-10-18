@@ -1,4 +1,4 @@
-package com.example.demohilts.screens.genre
+package com.example.demohilts.screens.kw
 
 import android.os.Bundle
 import android.util.Log
@@ -8,11 +8,11 @@ import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.demohilts.base.FullScreenBottomSheetDialogFragment
-import com.example.demohilts.data.entity.Genre
 import com.example.demohilts.data.entity.MovieSummary
 import com.example.demohilts.data.service.CoroutineState
-import com.example.demohilts.databinding.LayoutGenreMovieBinding
+import com.example.demohilts.databinding.LayoutKeywordMovieBinding
 import com.example.demohilts.screens.detail.DetailFragment
+import com.example.demohilts.screens.genre.GenreMovieAdapter
 import com.example.demohilts.utils.SPUtils
 import com.example.demohilts.utils.gone
 import com.example.demohilts.utils.show
@@ -22,20 +22,20 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class GenreMoviesFragment : FullScreenBottomSheetDialogFragment<LayoutGenreMovieBinding>() {
+class KWMoviesFragment : FullScreenBottomSheetDialogFragment<LayoutKeywordMovieBinding>() {
 
-    private val viewModel: GenreMoviesVM by viewModels()
+    private val viewModel: KWMoviesVM by viewModels()
 
     @Inject
     lateinit var moviesAdapter: GenreMovieAdapter
 
-    private var genre: Genre? = null
+    private var kw = ""
     private var page = 1
     private var isEnd = false
     private var isLoading = false
 
     override fun inflateViewBinding(container: ViewGroup?) =
-        LayoutGenreMovieBinding.inflate(layoutInflater, container, false)
+        LayoutKeywordMovieBinding.inflate(layoutInflater, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -46,16 +46,14 @@ class GenreMoviesFragment : FullScreenBottomSheetDialogFragment<LayoutGenreMovie
     }
 
     private fun initViews() = with(viewBinding) {
-        recyclerGenreMovies.adapter = moviesAdapter
-        textGenre.text = genre?.name ?: "---"
-        layoutHeader.textTitle.text = genre?.name ?: "---"
+        recyclerKWMovies.adapter = moviesAdapter
+        textKW.text = "Movies for: " + kw
+        layoutHeader.textTitle.text = "Movies for: " + kw
         layoutHeader.header.gone()
     }
 
     private fun initData() = with(viewModel) {
-        genre?.id?.let {
-            getGenreMovies(page, it)
-        }
+        getKWMovies(page, kw)
     }
 
     private fun observeData() = with(viewModel) {
@@ -64,7 +62,7 @@ class GenreMoviesFragment : FullScreenBottomSheetDialogFragment<LayoutGenreMovie
                 when (it.status) {
                     CoroutineState.LOADING -> displayLoadingState()
                     CoroutineState.SUCCESS -> {
-                        it.data?.results?.let { movies -> displaySuccessStateDetail(movies) }
+                        it.data?.results?.let { movies -> displaySuccessStateDetail(movies, it.data.total_results ?: 0) }
                     }
                     CoroutineState.ERROR -> {
                         displayErrorState(it.message ?: "Error!")
@@ -88,7 +86,7 @@ class GenreMoviesFragment : FullScreenBottomSheetDialogFragment<LayoutGenreMovie
         textLoadMore.setOnClickListener {
             if (isLoading) return@setOnClickListener
             page += 1
-            viewModel.getGenreMovies(page, genre?.id ?: -1)
+            viewModel.getKWMovies(page, kw)
             progress.show()
             Log.i("aaa", "loadmore page $page")
         }
@@ -104,7 +102,7 @@ class GenreMoviesFragment : FullScreenBottomSheetDialogFragment<LayoutGenreMovie
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
 
-    private fun displaySuccessStateDetail(data: List<MovieSummary>) = with(viewBinding) {
+    private fun displaySuccessStateDetail(data: List<MovieSummary>, count: Int) = with(viewBinding) {
         isLoading = false
         progress.gone()
         textLoadMore.show()
@@ -115,6 +113,11 @@ class GenreMoviesFragment : FullScreenBottomSheetDialogFragment<LayoutGenreMovie
         val currentList = moviesAdapter.currentList.toMutableList()
         currentList.addAll(data)
         moviesAdapter.submitList(currentList)
+        textKW.text = if (page == 1 && data.isEmpty()) {
+            "No movie for: " + kw
+        } else {
+            "$count movie(s) for: " + kw
+        }
     }
 
     private fun openDetail(id: Int, type: String) {
@@ -127,8 +130,8 @@ class GenreMoviesFragment : FullScreenBottomSheetDialogFragment<LayoutGenreMovie
     }
 
     companion object {
-        fun getInstance(genre: Genre) = GenreMoviesFragment().apply {
-            this.genre = genre
+        fun getInstance(kw: String) = KWMoviesFragment().apply {
+            this.kw = kw
         }
     }
 }

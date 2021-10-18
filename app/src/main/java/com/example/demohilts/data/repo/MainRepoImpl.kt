@@ -8,26 +8,27 @@ class MainRepoImpl @Inject constructor(private val apiService: ApiService) : Mai
     override suspend fun getPopulars(key: String, page: Int) =
         apiService.getDiscover(apiKey = key, page = page)
 
-    override suspend fun getTrendings(key: String) = apiService.getTrendingDay(key)
+    override suspend fun getTrendings(key: String) = apiService.getTrendingDay(apiKey = key)
 
     override suspend fun getGenres(key: String) = apiService.getGenres(apiKey = key)
 
-    override suspend fun getMovieDetail(id: Int, key: String) =
-        apiService.getMovieDetail(id = id, key = key)
+    override suspend fun getMovieDetail(id: Int, key: String, type: String) =
+        apiService.getMovieDetail(id = id, key = key, type = type)
 
-    override suspend fun getCastsAndCrews(id: Int, key: String) =
-        apiService.getCastsAndCrews(id = id, key = key)
+    override suspend fun getCastsAndCrews(id: Int, key: String, type: String) =
+        apiService.getCastsAndCrews(id = id, key = key, type = type)
 
     override suspend fun getSimilars(
         id: Int,
         key: String,
         page: Int
-    ) = apiService.getSimilars(id = id, key = key, page = page)
+        , type: String
+    ) = apiService.getSimilars(id = id, key = key, page = page, type = type)
 
-    override suspend fun getReviews(id: Int, key: String, page: Int) =
-        apiService.getReviews(id = id, key = key, page = page)
+    override suspend fun getReviews(id: Int, key: String, page: Int, type: String) =
+        apiService.getReviews(id = id, key = key, page = page, type = type)
 
-    override suspend fun getVideos(id: Int, key: String) = apiService.getMovieVideos(id, key)
+    override suspend fun getVideos(id: Int, key: String, type: String) = apiService.getMovieVideos(id = id, key = key, type = type)
 
     override suspend fun getGenreMovies(
         key: String,
@@ -44,7 +45,7 @@ class MainRepoImpl @Inject constructor(private val apiService: ApiService) : Mai
     override suspend fun searchKW(key: String, page: Int, query: String) =
         apiService.searchKW(key, query, page)
 
-    override suspend fun getMovieImages(id: Int, key: String) = apiService.getMovieImages(id, key)
+    override suspend fun getMovieImages(id: Int, key: String, type: String) = apiService.getMovieImages(id = id, key = key, type = type)
 
-    override suspend fun getMovieKeyWords(id: Int, key: String) = apiService.getMovieKWs(id, key)
+    override suspend fun getMovieKeyWords(id: Int, key: String, type: String) = apiService.getMovieKWs(id = id, key = key, type = type)
 }

@@ -82,7 +82,7 @@ class TrendingFragment : FullScreenBottomSheetDialogFragment<LayoutGenreMovieBin
         }
         layoutHeader.imageBack.setOnClickListener { dismiss() }
         imageBackOut.setOnClickListener { dismiss() }
-        moviesAdapter.onClickListener = { id -> openDetail(id) }
+        moviesAdapter.onClickListener = { id, key -> openDetail(id, key) }
         textLoadMore.setOnClickListener {
             if (isLoading) return@setOnClickListener
             page += 1
@@ -115,12 +115,12 @@ class TrendingFragment : FullScreenBottomSheetDialogFragment<LayoutGenreMovieBin
         moviesAdapter.submitList(currentList)
     }
 
-    private fun openDetail(id: Int) {
-        val detailFragment = DetailFragment.getInstance(id)
+    private fun openDetail(id: Int, type: String) {
+        val detailFragment = DetailFragment.getInstance(id, type)
         detailFragment.show(
             requireActivity().supportFragmentManager,
             detailFragment::class.java.simpleName
         )
-        SPUtils.saveCurrentId(requireContext(), id)
+        SPUtils.saveCurrentId(requireContext(), id, type)
     }
 }

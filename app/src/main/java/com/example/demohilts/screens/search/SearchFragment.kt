@@ -11,7 +11,6 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
@@ -111,8 +110,8 @@ class SearchFragment : FullScreenBottomSheetDialogFragment<LayoutSearchBinding>(
             progress.show()
             viewModel.searchMovies(page, viewBinding.layoutSearchHeader.editSearch.text.toString())
         }
-        adapter.onClickListener = {
-            openDetail(it)
+        adapter.onClickListener = { id, type ->
+            openDetail(id, type)
         }
         recyclerResults.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -213,13 +212,13 @@ class SearchFragment : FullScreenBottomSheetDialogFragment<LayoutSearchBinding>(
         progress.gone()
     }
 
-    private fun openDetail(id: Int) {
-        val detailFragment = DetailFragment.getInstance(id)
+    private fun openDetail(id: Int, type: String) {
+        val detailFragment = DetailFragment.getInstance(id, type)
         detailFragment.show(
             requireActivity().supportFragmentManager,
             detailFragment::class.java.simpleName
         )
-        SPUtils.saveCurrentId(requireContext(), id)
+        SPUtils.saveCurrentId(requireContext(), id, type)
     }
 
     private fun hideKeyboard() {

@@ -28,6 +28,7 @@ class ImageVH(private val itemVB: ItemImageBinding) : RecyclerView.ViewHolder(it
 
     fun renderImage(path: String) {
         //itemVB.image.setImageDrawable(null)
+
         Glide.with(itemView.context).load(Constants.baseImageUrl + path).into(itemVB.image)
     }
 }

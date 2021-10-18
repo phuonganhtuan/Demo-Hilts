@@ -5,17 +5,12 @@ import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.DisplayMetrics
-import android.util.SparseArray
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import at.huber.youtubeExtractor.VideoMeta
-import at.huber.youtubeExtractor.YouTubeExtractor
-import at.huber.youtubeExtractor.YtFile
 import com.bumptech.glide.Glide
 import com.example.demohilts.R
 import com.example.demohilts.base.FullScreenBottomSheetDialogFragment
@@ -26,12 +21,11 @@ import com.example.demohilts.databinding.LayoutDetailBinding
 import com.example.demohilts.screens.detail.reviews.ReviewsAdapter
 import com.example.demohilts.screens.detail.trailers.TrailersFragment
 import com.example.demohilts.screens.genre.GenreMoviesFragment
+import com.example.demohilts.screens.kw.KWMoviesFragment
 import com.example.demohilts.utils.Constants
 import com.example.demohilts.utils.SPUtils
 import com.example.demohilts.utils.gone
 import com.example.demohilts.utils.show
-import com.google.android.exoplayer2.C
-import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.material.chip.Chip
 import dagger.hilt.android.AndroidEntryPoint
@@ -62,6 +56,7 @@ class DetailFragment : FullScreenBottomSheetDialogFragment<LayoutDetailBinding>(
     val exoPlayer by lazy { SimpleExoPlayer.Builder(requireContext()).build() }
 
     private var movieId: Int? = null
+    private var type = ""
     private var reviewPage = 1
     private var similarPage = 1
 
@@ -93,13 +88,13 @@ class DetailFragment : FullScreenBottomSheetDialogFragment<LayoutDetailBinding>(
 
     private fun initData() = with(viewModel) {
         movieId?.let {
-            getDetail(it)
-            getCastsAndCrews(it)
-            getReviews(it, reviewPage)
-            getSimilarMovies(it, similarPage)
-            getVideos(it)
-            getImages(it)
-            getKws(it)
+            getDetail(it, type)
+            getCastsAndCrews(it, type)
+            getReviews(it, reviewPage, type)
+            getSimilarMovies(it, similarPage, type)
+            getVideos(it, type)
+            getImages(it, type)
+            getKws(it, type)
         }
     }
 
@@ -195,8 +190,8 @@ class DetailFragment : FullScreenBottomSheetDialogFragment<LayoutDetailBinding>(
         }
         layoutHeader.imageBack.setOnClickListener { dismiss() }
         imageBackOut.setOnClickListener { dismiss() }
-        similarAdapter.onClickListener = { id ->
-            openSimilar(id)
+        similarAdapter.onClickListener = { id, type ->
+            openSimilar(id, type)
         }
         layoutHeader.textTrailer.setOnClickListener {
             val videos = viewModel.videos.value.data?.results ?: return@setOnClickListener
@@ -230,6 +225,10 @@ class DetailFragment : FullScreenBottomSheetDialogFragment<LayoutDetailBinding>(
     private fun displaySuccessStateDetail(data: MovieDetail) = with(viewBinding) {
         textItemName.text = data.title
         textHeader.text = data.title
+        if (!data.name.isNullOrEmpty()) {
+            textItemName.text = data.name
+            textHeader.text = data.name
+        }
         if (data.adult) layoutHeader.textAdult.show() else layoutHeader.textAdult.gone()
         (data.overview + "\n\nReleased: ${data.release_date}\n\nCompanies: ${data.getCompaniesText()}").also {
             textDesc.text = it
@@ -287,6 +286,9 @@ class DetailFragment : FullScreenBottomSheetDialogFragment<LayoutDetailBinding>(
             layoutHeader.pagerImages.adapter = imagesAdapter
             imagesAdapter.imageList = imageList
             imagesAdapter.notifyDataSetChanged()
+//            recyclerImages.adapter = imagesAdapter
+//            imagesAdapter.imageList = imageList
+//            imagesAdapter.notifyDataSetChanged()
         }
     }
 
@@ -296,15 +298,14 @@ class DetailFragment : FullScreenBottomSheetDialogFragment<LayoutDetailBinding>(
                 R.layout.chip_genre, kWChipGroup, false
             ) as Chip
             chip.apply {
-                //tag = it.id.toString()
+                tag = it.name
                 text = it.name
                 isClickable = true
                 isCheckable = false
-//                setOnClickListener {
-//                    val id = it.tag.toString().toIntOrNull() ?: return@setOnClickListener
-//                    val genre = data.genres.filter { it.id == id }[0]
-//                    openGenreMovies(genre)
-//                }
+                setOnClickListener {
+                    val kw = it.tag.toString()
+                    openKWMovies(kw)
+                }
             }
             kWChipGroup.addView(chip)
         }
@@ -388,13 +389,13 @@ class DetailFragment : FullScreenBottomSheetDialogFragment<LayoutDetailBinding>(
         }
     }
 
-    private fun openSimilar(id: Int) {
-        val detailFragment = getInstance(id)
+    private fun openSimilar(id: Int, type: String) {
+        val detailFragment = getInstance(id, type)
         detailFragment.show(
             requireActivity().supportFragmentManager,
             detailFragment::class.java.simpleName
         )
-        SPUtils.saveCurrentId(requireContext(), id)
+        SPUtils.saveCurrentId(requireContext(), id, type)
     }
 
     private fun openGenreMovies(genre: Genre) {
@@ -405,9 +406,19 @@ class DetailFragment : FullScreenBottomSheetDialogFragment<LayoutDetailBinding>(
         )
     }
 
+    private fun openKWMovies(kw: String) {
+        val kwMoviesFragment = KWMoviesFragment.getInstance(kw)
+        kwMoviesFragment.show(
+            requireActivity().supportFragmentManager,
+            kwMoviesFragment::class.java.simpleName
+        )
+    }
+
     companion object {
-        fun getInstance(id: Int) = DetailFragment().apply {
+        fun getInstance(id: Int, type: String) = DetailFragment().apply {
             movieId = id
+            this.type = type
+            if (type == "null") this.type = "movie"
         }
     }
 }

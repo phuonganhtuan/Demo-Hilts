@@ -58,10 +58,10 @@ class MainViewModel @Inject constructor(private val repo: MainRepo) : ViewModel(
     val detail: MutableStateFlow<BaseResults<MovieDetail>> =
         MutableStateFlow(BaseResults.loading(null))
 
-    fun getDetail(id: Int) = viewModelScope.launch {
+    fun getDetail(id: Int, type: String) = viewModelScope.launch {
         detail.value = BaseResults.loading(null)
         try {
-            detail.value = BaseResults.success(repo.getMovieDetail(id, apiKey))
+            detail.value = BaseResults.success(repo.getMovieDetail(id, apiKey, type))
         } catch (exception: java.lang.Exception) {
             detail.value = BaseResults.error(null, "Cannot get this movie detail.")
         }

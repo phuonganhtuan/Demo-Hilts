@@ -14,5 +14,7 @@ data class MovieSummary(
     val title: String?,
     val video: Boolean?,
     val vote_average: Double? = 0.0,
-    val vote_count: Int?
+    val vote_count: Int?,
+    val name: String?,
+    val media_type: String?,
 )
